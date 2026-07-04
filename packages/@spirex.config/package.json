@@ -1,6 +1,21 @@
 {
     "name": "@spirex/config",
     "version": "1.0.0",
+    "description": "Composable, priority-based configuration with typed access, section scoping, lazy fallbacks, and hot reload — combine multiple providers for layered app settings.",
+    "keywords": [
+        "config",
+        "configuration",
+        "env",
+        "settings",
+        "layered",
+        "builder",
+        "typed",
+        "scoped",
+        "reload",
+        "fallback",
+        "multi-provider",
+        "spirex"
+    ],
     "license": "MIT",
     "private": false,
     "sideEffects": false,
