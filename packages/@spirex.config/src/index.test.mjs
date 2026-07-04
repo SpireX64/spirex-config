@@ -221,6 +221,23 @@ describe("@spirex/config", () => {
                 `${sectionPath}:${key}`,
             );
         });
+
+        test("Last provider overrides previous", () => {
+            // Arrange -------
+            var key = "foo";
+            var providerA = mockProvider(() => "A");
+            var providerB = mockProvider(() => "B");
+
+            var config = configBuilder().add(providerA).add(providerB).build();
+
+            // Act -------
+            var value = config.getString(key);
+
+            // Assert ----
+            expect(providerA.get).not.toHaveBeenCalled();
+            expect(providerB.get).toHaveBeenCalledExactlyOnceWith(key);
+            expect(value).eq("B");
+        });
     });
 
     describe("InMemoryConfigProvider", () => {

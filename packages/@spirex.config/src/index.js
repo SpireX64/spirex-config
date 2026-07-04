@@ -29,7 +29,7 @@ function parseBoolean(str) {
 
 function getValue(providers, map, key, def) {
     var value;
-    for (var i = providers.length; i >= 0; --i) {
+    for (var i = providers.length - 1; i >= 0; --i) {
         value = providers[i].get(key);
         if (value !== undefined) break;
     }
