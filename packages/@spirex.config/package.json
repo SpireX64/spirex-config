@@ -9,6 +9,22 @@
         "email": "SpireX@outlook.com",
         "url": "https://github.com/SpireX64"
     },
+    "main": "./dist/index.js",
+    "module": "./dist/index.mjs",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "import": {
+                "default": "./dist/index.mjs"
+            },
+            "require": {
+                "default": "./dist/index.cjs"
+            },
+            "default": {
+                "default": "./dist/index.js"
+            }
+        }
+    },
     "scripts": {
         "prepack": "yarn build:release && cp ../../README.md ./README.md",
         "test": "vitest run --config ./vitest.config.mjs",
