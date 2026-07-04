@@ -52,6 +52,9 @@ function createSection(config, path) {
         getInteger: sectionGetter(config.getInteger),
         getFloat: sectionGetter(config.getFloat),
         getString: sectionGetter(config.getString),
+        map(mapper) {
+            return mapper(this);
+        },
     };
 }
 

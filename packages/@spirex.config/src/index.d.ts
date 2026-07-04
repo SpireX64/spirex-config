@@ -44,7 +44,7 @@ export interface IConfig {
      * @param key - The configuration key.
      * @param def - A fallback value or factory, used when the key is missing.
      */
-    getString(key: string, def: TDefValue<string>): string;
+    getString(key: string, def?: TDefValue<string>): string;
 
     /**
      * Returns a configuration value as an integer.
@@ -52,7 +52,7 @@ export interface IConfig {
      * @param key - The configuration key.
      * @param def - A fallback value or factory, used when the key is missing.
      */
-    getInteger(key: string, def: TDefValue<number>): number;
+    getInteger(key: string, def?: TDefValue<number>): number;
 
     /**
      * Returns a configuration value as a floating-point number.
@@ -60,7 +60,7 @@ export interface IConfig {
      * @param key - The configuration key.
      * @param def - A fallback value or factory, used when the key is missing.
      */
-    getFloat(key: string, def: TDefValue<number>): number;
+    getFloat(key: string, def?: TDefValue<number>): number;
 
     /**
      * Returns a configuration value as a boolean.
@@ -68,7 +68,7 @@ export interface IConfig {
      * @param key - The configuration key.
      * @param def - A fallback value or factory, used when the key is missing.
      */
-    getBoolean(key: string, def: TDefValue<boolean>): boolean;
+    getBoolean(key: string, def?: TDefValue<boolean>): boolean;
 }
 
 /**
@@ -77,6 +77,9 @@ export interface IConfig {
 export interface IConfigSection extends IConfig {
     /** The dot-separated path prefix for this section. */
     readonly path: string;
+
+    /** Map section to specific struct */
+    map<T>(mapper: (config: this) => T): T;
 }
 
 /**
