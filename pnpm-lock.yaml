@@ -56,6 +56,12 @@ importers:
 
   packages/@spirex.config: {}
 
+  packages/@spirex.config-provider-env:
+    devDependencies:
+      '@spirex/config':
+        specifier: workspace:*
+        version: link:../@spirex.config
+
 packages:
 
   '@babel/code-frame@7.29.7':
