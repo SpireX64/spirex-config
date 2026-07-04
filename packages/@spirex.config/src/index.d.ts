@@ -1,3 +1,5 @@
+export declare const SECTION_CHAR: string;
+
 /** Provides configuration values by key.*/
 export interface IConfigProvider {
     /**
