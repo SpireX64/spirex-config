@@ -222,4 +222,82 @@ describe("@spirex/config", () => {
             );
         });
     });
+
+    describe("InMemoryConfigProvider", () => {
+        describe("Create in-memory provider", () => {
+            test("Empty", () => {
+                // Act ----------
+                var provider = new InMemoryConfigProvider();
+                provider.load();
+
+                // Assert -------
+                expect(provider.get("any")).toBeUndefined();
+            });
+
+            test("From object", () => {
+                // Arrange -------
+                var source = { foo: "bar" };
+
+                // Act -----------
+                var provider = new InMemoryConfigProvider(source);
+                provider.load();
+
+                // Assert --------
+                expect(provider.get("foo")).eq("bar");
+            });
+
+            test("From map", () => {
+                // Arrange -------
+                var sourceMap = new Map();
+                sourceMap.set("foo", "bar");
+
+                // Act -----------
+                var provider = new InMemoryConfigProvider(sourceMap);
+                provider.load();
+
+                // Assert --------
+                expect(provider.get("foo")).eq("bar");
+            });
+
+            test("From object entries", () => {
+                // Arrange -------
+                var entries = [["foo", "bar"]];
+
+                // Act -----------
+                var provider = new InMemoryConfigProvider(entries);
+                provider.load();
+
+                // Assert --------
+                expect(provider.get("foo")).eq("bar");
+            });
+        });
+
+        describe("Set value", () => {
+            test("When provider is empty", () => {
+                // Arrange ---------
+                var provider = new InMemoryConfigProvider();
+                provider.load();
+
+                // Act ------------
+                provider.set("foo", "bar");
+
+                // Assert ---------
+                expect(provider.get("foo")).eq("bar");
+            });
+
+            test("Override exist value", () => {
+                // Arrange -------
+                var provider = new InMemoryConfigProvider({
+                    foo: "bar",
+                });
+                provider.load();
+
+                // Act -----------
+                provider.set("foo", "qwe");
+
+                // Assert --------
+                expect(provider.get("foo")).eq("qwe");
+            });
+        });
+    });
 });

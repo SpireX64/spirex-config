@@ -29,8 +29,8 @@ function parseBoolean(str) {
 
 function getValue(providers, map, key, def) {
     var value;
-    for (var provider of providers) {
-        value = provider.get(key);
+    for (var i = providers.length; i >= 0; --i) {
+        value = providers[i].get(key);
         if (value !== undefined) break;
     }
 
@@ -105,4 +105,42 @@ export function configBuilder() {
             },
         },
     );
+}
+
+function fillMapByEntries(map, entries) {
+    for (var [key, value] of entries) {
+        map.set(key, value);
+    }
+}
+
+export class InMemoryConfigProvider {
+    constructor(kvSource) {
+        this._kvSource = kvSource;
+        this._cache = null;
+    }
+
+    load() {
+        if (!this._kvSource || typeof this._kvSource !== "object") return;
+
+        this._cache = new Map();
+        if (this._kvSource instanceof Map) {
+            this._kvSource.forEach((value, key) => {
+                this._cache.set(key, value);
+            });
+        } else if (Array.isArray(this._kvSource)) {
+            fillMapByEntries(this._cache, this._kvSource);
+        } else {
+            fillMapByEntries(this._cache, Object.entries(this._kvSource));
+        }
+    }
+
+    get(key) {
+        if (!this._cache) return undefined;
+        return this._cache.get(key);
+    }
+
+    set(key, value) {
+        if (!this._cache) this._cache = new Map();
+        this._cache.set(key, value);
+    }
 }
