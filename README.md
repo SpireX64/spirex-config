@@ -196,29 +196,29 @@ const config = configBuilder()
   .build();
 ```
 
-### Layered example with environment variables
+### Using file-based and environment providers
 
-Combine an in-memory defaults provider with `@spirex/config-provider-env` so environment variables override defaults:
+In addition to the built-in `InMemoryConfigProvider`, a set of optional packages provide ready-to-use providers for common configuration sources:
+
+| Package | Source |
+|---|---|
+| `@spirex/config-provider-env` | Environment variables |
+| `@spirex/config-provider-json` | `.json` files |
+| `@spirex/config-provider-ini` | `.ini` files |
+| `@spirex/config-provider-yaml` | `.yaml` / `.yml` files |
+
+Install what you need and add it to the builder — all providers share the same `IConfigProvider` interface and work together seamlessly:
 
 ```ts
-import { configBuilder } from "@spirex/config";
-import { InMemoryConfigProvider } from "@spirex/config/in-memory";
 import { EnvConfigProvider } from "@spirex/config-provider-env";
+import { JsonConfigProvider } from "@spirex/config-provider-json";
 
 const config = configBuilder()
-  .add(
-    new InMemoryConfigProvider({
-      db: { host: "localhost", port: "5432" },
-    }),
-  )
+  .add(new InMemoryConfigProvider({ db: { host: "localhost" } }))
+  .add(new JsonConfigProvider("./config.json"))
   .add(new EnvConfigProvider("APP_", true))
   .build();
-
-// With APP_DB__HOST=prod.example.com, this returns "prod.example.com"
-const host = config.getString("db:host");
 ```
-
-Environment variables use `__` (double underscore) to denote section separators and are matched case-insensitively.
 
 ## API reference
 
