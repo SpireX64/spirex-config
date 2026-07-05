@@ -1,111 +1,92 @@
 export const SECTION_CHAR = ":";
 
-var charCodeZero = "0".charCodeAt(0);
-var charCodeNine = "9".charCodeAt(0);
+var len = (v) => v.length;
+var withProps = Object.defineProperties;
+var readonlyPropValue = (v) => ({ value: v, writable: false });
 
-function isDigitChar(n) {
-    return n >= charCodeZero && n <= charCodeNine;
-}
-
-function isNumeric(str) {
-    for (var i = 0; i < str.length; ++i) {
-        if (!isDigitChar(str.charCodeAt(i))) return false;
+var isNumeric = (str) => {
+    for (var i = 0; i < len(str); ++i) {
+        var c = str.charCodeAt(i);
+        if (c < 48 || c > 57) return false;
     }
     return true;
-}
+};
 
-/**
- * Parse string to boolean value
- * @param {string} str
- * @returns {boolean}
- */
-function parseBoolean(str) {
+var parseBoolean = (str) => {
     str = str.trim().toLowerCase();
-    if (str.startsWith("y") || str.startsWith("t") || str.startsWith("a"))
-        return true;
+    var c = str[0];
+    if (c === "y" || c === "t" || c === "a") return true;
+    return len(str) > 0 && isNumeric(str) && str !== "0";
+};
 
-    return str.length > 0 && isNumeric(str) && str !== "0";
-}
-
-function getValue(providers, map, key, def) {
+var getValue = (providers, map, key, def) => {
     var value;
-    for (var i = providers.length - 1; i >= 0; --i) {
+    for (var i = len(providers) - 1; i >= 0; --i) {
         value = providers[i].get(key);
         if (value !== undefined) break;
     }
-
     if (value === undefined) {
         if (def) return typeof def === "function" ? def() : def;
         throw new Error(`Configuration value is not defined: ${key}`);
     }
-
     return map ? map(value) : value;
-}
+};
 
-function createSection(config, path) {
-    const pathJoin = (key) => path + SECTION_CHAR + key;
-    const sectionGetter = (getter) => (key, def) => getter(pathJoin(key), def);
-    return {
+var mappers = {
+    getBoolean: parseBoolean,
+    getInteger: parseInt,
+    getFloat: parseFloat,
+    getString: null,
+};
+var mapMappers = (f, i = {}) =>
+    Object.keys(mappers).reduce((o, m) => ((o[m] = f(m)), o), i);
+
+var createSection = (config, path) => {
+    var pathJoin = (key) => path + SECTION_CHAR + key;
+    var sectionGetter = (getter) => (key, def) => getter(pathJoin(key), def);
+
+    return mapMappers((m) => sectionGetter(config[m]), {
         path,
         section: (subPath) => config.section(pathJoin(subPath)),
-        getBoolean: sectionGetter(config.getBoolean),
-        getInteger: sectionGetter(config.getInteger),
-        getFloat: sectionGetter(config.getFloat),
-        getString: sectionGetter(config.getString),
         map(mapper) {
             return mapper(this);
         },
-    };
-}
+    });
+};
 
-function createConfig(providers) {
-    return {
-        getBoolean: getValue.bind(0, providers, parseBoolean),
-        getInteger: getValue.bind(0, providers, parseInt),
-        getFloat: getValue.bind(0, providers, parseFloat),
-        getString: getValue.bind(0, providers, 0),
+var createConfig = (providers) =>
+    mapMappers((m) => getValue.bind(null, providers, mappers[m]), {
         section(path) {
             return createSection(this, path);
         },
-    };
-}
+    });
 
-function createConfigRoot(providers) {
+var createConfigRoot = (providers) => {
     var config = createConfig(providers);
-
-    config.reload = function () {
+    config.reload = () => {
         for (var p of providers) p.load();
     };
-
-    return Object.defineProperties(config, {
-        providers: {
-            value: providers,
-            writable: false,
-        },
+    return withProps(config, {
+        providers: readonlyPropValue(providers),
     });
-}
+};
 
 export function configBuilder() {
-    const providers = [];
+    var providers = [];
 
     function add(provider) {
         providers.push(provider);
         return this;
     }
 
-    function build() {
+    var build = () => {
         var root = createConfigRoot(providers);
         root.reload();
         return root;
-    }
+    };
 
-    return Object.defineProperties(
+    return withProps(
         { add, build },
-        {
-            providers: {
-                value: providers,
-                writable: false,
-            },
-        },
+        { providers: readonlyPropValue(providers) },
     );
 }
