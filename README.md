@@ -4,8 +4,8 @@
 
 [![npm version](https://badge.fury.io/js/@spirex%2Fconfig.svg)](https://www.npmjs.com/package/@spirex/config)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
-[![TypeScript](https://img.shields.io/badge/TypeScript-first--class-blue.svg)](https://www.typescriptlang.org/)
-![Bundle size](https://img.shields.io/badge/bundle-1.8KB%20%7C%200.8KB%20gzip-brightgreen)
+[![TypeScript](https://img.shields.io/badge/TypeScript-ready-blue.svg)](https://www.typescriptlang.org/)
+![Bundle size](https://img.shields.io/badge/bundle-1.2KB%20%7C%200.6KB%20gzip%20-brightgreen)
 
 `@spirex/config` is a lightweight, dependency-free JavaScript/TypeScript configuration library for building layered app settings. Combine multiple configuration providers — defaults, environment variables, file sources, or your own custom implementations — and read values through a clean, typed API. Providers added later override earlier ones, so deployment-specific values naturally take precedence over built-in defaults.
 
@@ -17,7 +17,7 @@
 - **Lazy fallbacks** — defaults can be plain values or factory functions invoked only when needed.
 - **Hot reload** — refresh every provider at runtime with a single `config.reload()` call.
 - **Custom providers in seconds** — implement a two-method `IConfigProvider` interface.
-- **Tiny footprint** — ~1.8 KB minified, ~0.8 KB gzipped.
+- **Tiny footprint** — ~1.2kb (0.6kb gzip), ~0.7kb (0.4kb gzip) in-memory provider. Tree-shakeable.
 - **Zero runtime dependencies**.
 
 ## Installation
@@ -38,15 +38,15 @@ pnpm add @spirex/config
 ## Quick start
 
 ```ts
-import { configBuilder, InMemoryConfigProvider } from "@spirex/config";
+import { configBuilder } from "@spirex/config";
+import { InMemoryConfigProvider } from "@spirex/config/in-memory";
 
 const config = configBuilder()
   .add(
     new InMemoryConfigProvider({
-      "app:name": "MyApp",
-      "db:host": "localhost",
-      "db:port": "5432",
-      "features:darkMode": "true",
+      app: { name: "MyApp" },
+      db: { host: "localhost", port: "5432" },
+      features: { darkMode: "true" },
     }),
   )
   .build();
@@ -79,6 +79,8 @@ const builder = configBuilder();
 Registers a provider. Multiple providers are queried in order, and **the last provider that has a value wins**.
 
 ```ts
+import { InMemoryConfigProvider } from "@spirex/config/in-memory";
+
 builder.add(new InMemoryConfigProvider({ host: "fallback" }));
 builder.add(new InMemoryConfigProvider({ host: "override" }));
 ```
@@ -141,22 +143,31 @@ config.reload();
 
 ### Built-in provider: `InMemoryConfigProvider`
 
-Stores key-value pairs in memory. Accepts a `Map`, a plain object, an array of `[key, value]` tuples, or no initial data.
+Stores key-value pairs in memory. Accepts a `Map`, a plain object, an array of `[key, value]` tuples (including deeply nested `Object.entries`–style arrays), or no initial data.
 
 ```ts
-// From a plain object
+import { InMemoryConfigProvider } from "@spirex/config/in-memory";
+
+// From a plain object (nested objects are flattened with ":" separator)
 const defaults = new InMemoryConfigProvider({
-  "app:name": "MyApp",
-  "db:host": "localhost",
+  app: { name: "MyApp" },
+  db: { host: "localhost", port: "5432" },
 });
+// → "app:name" = "MyApp", "db:host" = "localhost", "db:port" = "5432"
 
 // Empty, then populated
 const runtime = new InMemoryConfigProvider();
 runtime.set("app:name", "UpdatedApp");
 
+// Deeply nested via Object.entries-style arrays
+const deep = new InMemoryConfigProvider([
+  ["db", [["host", "prod.example.com"], ["port", "5432"]]],
+]);
+// → "db:host" = "prod.example.com", "db:port" = "5432"
+
 // From a Map
 const fromMap = new InMemoryConfigProvider(
-  new Map([["app:name", "MyApp"]]),
+  new Map([["app", { name: "MyApp" }]]),
 );
 ```
 
@@ -190,14 +201,14 @@ const config = configBuilder()
 Combine an in-memory defaults provider with `@spirex/config-provider-env` so environment variables override defaults:
 
 ```ts
-import { configBuilder, InMemoryConfigProvider } from "@spirex/config";
+import { configBuilder } from "@spirex/config";
+import { InMemoryConfigProvider } from "@spirex/config/in-memory";
 import { EnvConfigProvider } from "@spirex/config-provider-env";
 
 const config = configBuilder()
   .add(
     new InMemoryConfigProvider({
-      "db:host": "localhost",
-      "db:port": "5432",
+      db: { host: "localhost", port: "5432" },
     }),
   )
   .add(new EnvConfigProvider("APP_", true))

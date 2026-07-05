@@ -37,16 +37,16 @@ pnpm add @spirex/config @spirex/config-provider-env
 ## Quick start
 
 ```ts
-import { configBuilder, InMemoryConfigProvider } from "@spirex/config";
+import { configBuilder } from "@spirex/config";
+import { InMemoryConfigProvider } from "@spirex/config/in-memory";
 import { EnvConfigProvider } from "@spirex/config-provider-env";
 
 const config = configBuilder()
   // Built-in defaults
   .add(
     new InMemoryConfigProvider({
-      "db:host": "localhost",
-      "db:port": "5432",
-      "features:darkMode": "false",
+      db: { host: "localhost", port: "5432" },
+      features: { darkMode: "false" },
     }),
   )
   // Environment overrides, e.g. APP_DB__HOST=prod.example.com
@@ -135,11 +135,12 @@ const level = config.getString("log:level"); // "debug"
 Add the provider to any `configBuilder()` stack. Because later providers override earlier ones, environment variables naturally take precedence over file or in-memory defaults.
 
 ```ts
-import { configBuilder, InMemoryConfigProvider } from "@spirex/config";
+import { configBuilder } from "@spirex/config";
+import { InMemoryConfigProvider } from "@spirex/config/in-memory";
 import { EnvConfigProvider } from "@spirex/config-provider-env";
 
 const config = configBuilder()
-  .add(new InMemoryConfigProvider({ "server:port": "3000" })) // defaults
+  .add(new InMemoryConfigProvider({ server: { port: "3000" } })) // defaults
   .add(new EnvConfigProvider("APP_", true)) // environment overrides
   .build();
 
