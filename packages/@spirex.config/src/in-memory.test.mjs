@@ -231,9 +231,7 @@ describe("InMemoryConfigProvider", () => {
 
         test("Nested object inside Map source", () => {
             // Arrange
-            var source = new Map([
-                ["foo", { bar: { qwe: "hello" } }],
-            ]);
+            var source = new Map([["foo", { bar: { qwe: "hello" } }]]);
 
             // Act
             var provider = new InMemoryConfigProvider(source);
@@ -247,13 +245,7 @@ describe("InMemoryConfigProvider", () => {
     describe("Object.entries deep structure", () => {
         test("Deeply nested entries in constructor", () => {
             // Arrange
-            var entries = [
-                ["foo", [
-                    ["bar", [
-                        ["qwe", 42],
-                    ]],
-                ]],
-            ];
+            var entries = [["foo", [["bar", [["qwe", 42]]]]]];
 
             // Act
             var provider = new InMemoryConfigProvider(entries);
@@ -269,10 +261,13 @@ describe("InMemoryConfigProvider", () => {
             // Arrange
             var entries = [
                 ["app", "MyApp"],
-                ["db", [
-                    ["host", "localhost"],
-                    ["port", "5432"],
-                ]],
+                [
+                    "db",
+                    [
+                        ["host", "localhost"],
+                        ["port", "5432"],
+                    ],
+                ],
             ];
 
             // Act
@@ -291,11 +286,7 @@ describe("InMemoryConfigProvider", () => {
             provider.load();
 
             // Act
-            provider.set("foo", [
-                ["bar", [
-                    ["qwe", "hello"],
-                ]],
-            ]);
+            provider.set("foo", [["bar", [["qwe", "hello"]]]]);
 
             // Assert
             expect(provider.get("foo:bar:qwe")).eq("hello");
