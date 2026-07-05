@@ -25,6 +25,11 @@
         "email": "SpireX@outlook.com",
         "url": "https://github.com/SpireX64"
     },
+    "homepage": "https://github.com/SpireX64/spirex-config",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/SpireX64/spirex-config.git"
+    },
     "main": "./dist/index.js",
     "module": "./dist/index.mjs",
     "types": "./dist/index.d.ts",
