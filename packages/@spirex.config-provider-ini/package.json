@@ -1,0 +1,43 @@
+{
+    "name": "@spirex/config-provider-ini",
+    "version": "1.0.0",
+    "description": "INI file provider for @spirex/config — loads INI files into layered configuration with file watching support",
+    "keywords": [
+        "config",
+        "configuration",
+        "ini",
+        "file",
+        "provider",
+        "watch",
+        "settings",
+        "section",
+        "layered",
+        "multi-provider",
+        "spirex"
+    ],
+    "license": "MIT",
+    "private": false,
+    "sideEffects": false,
+    "author": {
+        "name": "Artem Sobolenkov (SpireX)",
+        "email": "SpireX@outlook.com",
+        "url": "https://github.com/SpireX64"
+    },
+    "main": "./dist/index.js",
+    "module": "./dist/index.mjs",
+    "types": "./dist/index.d.ts",
+    "scripts": {
+        "prepack": "yarn build:release",
+        "test": "vitest run --config ./vitest.config.mjs",
+        "test:c": "vitest run --config ./vitest.config.mjs --coverage",
+        "build": "rollup --config --environment NODE_ENV:development",
+        "build:release": "rollup --config --environment NODE_ENV:production",
+        "clean": "rimraf dist coverage"
+    },
+    "peerDependencies": {
+        "@spirex/config": "^1"
+    },
+    "devDependencies": {
+        "@spirex/config": "workspace:*"
+    }
+}
