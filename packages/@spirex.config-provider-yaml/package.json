@@ -27,8 +27,32 @@
     "main": "./dist/index.js",
     "module": "./dist/index.mjs",
     "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "import": {
+                "default": "./dist/index.mjs"
+            },
+            "require": {
+                "default": "./dist/index.cjs"
+            },
+            "default": {
+                "default": "./dist/index.js"
+            }
+        },
+        "./yaml-reader": {
+            "import": {
+                "default": "./dist/yaml-reader.mjs"
+            },
+            "require": {
+                "default": "./dist/yaml-reader.cjs"
+            },
+            "default": {
+                "default": "./dist/yaml-reader.js"
+            }
+        }
+    },
     "scripts": {
-        "prepack": "yarn build:release",
+        "prepack": "yarn build:release && cp ../../LICENSE ./LICENSE",
         "test": "vitest run --config ./vitest.config.mjs",
         "test:c": "vitest run --config ./vitest.config.mjs --coverage",
         "build": "rollup --config --environment NODE_ENV:development",
