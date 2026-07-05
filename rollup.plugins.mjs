@@ -4,6 +4,7 @@ import copy from "rollup-plugin-copy";
 export function getPackageRollup(config = {}) {
     const {
         umdName = "Lib",
+        name = "index",
         entry = "index.js",
         sourceDir = "./src",
         outDir = "./dist",
@@ -29,11 +30,11 @@ export function getPackageRollup(config = {}) {
         });
 
     const copyTypes = copy({
-        targets: [{ src: `${sourceDir}/index.d.ts`, dest: outDir }],
+        targets: [{ src: `${sourceDir}/${name}.d.ts`, dest: outDir }],
     });
 
     const sourceFile = `${sourceDir}/${entry}`;
-    const outFile = `${outDir}/index`;
+    const outFile = `${outDir}/${name}`;
 
     return [
         {

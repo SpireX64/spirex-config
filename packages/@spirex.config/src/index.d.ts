@@ -93,7 +93,7 @@ export interface IConfigSection extends IConfig {
  * @example
  * ```ts
  * const config = configBuilder()
- *   .add(new InMemoryConfigProvider({ host: "localhost" }))
+ *   .add(new EnvConfigProvider("APP_", true))
  *   .build();
  * ```
  */
@@ -113,53 +113,6 @@ export interface IConfigBuilder {
      * Finalises the builder and returns a ready-to-use {@link IConfig} instance.
      */
     build(): IConfig;
-}
-
-/**
- * A {@link IConfigProvider} that stores key-value pairs in memory.
- *
- * Supports construction from a `Map`, a plain `Record`, an array of
- * `[key, value]` tuples, or empty (no initial data).
- *
- * @example
- * ```ts
- * // Empty, then populate:
- * const provider = new InMemoryConfigProvider();
- * provider.set("host", "0.0.0.0");
- *
- * // From a Record:
- * const provider = new InMemoryConfigProvider({ host: "0.0.0.0" });
- * ```
- */
-export class InMemoryConfigProvider implements IConfigProvider {
-    /** Creates an empty provider. */
-    public constructor();
-    /**
-     * Creates a provider initialised from a `Map`.
-     * @param map - The source map.
-     */
-    public constructor(map: ReadonlyMap<string, string>);
-    /**
-     * Creates a provider initialised from a plain object.
-     * @param record - The source record.
-     */
-    public constructor(record: Readonly<Record<string, string>>);
-    /**
-     * Creates a provider initialised from an array of key-value tuples.
-     * @param entries - The source entries.
-     */
-    public constructor(entries: readonly [string, string][]);
-
-    get(key: string): string | undefined;
-    load(): void;
-
-    /**
-     * Stores a configuration value.
-     *
-     * @param key - The configuration key.
-     * @param value - The value to associate with the key.
-     */
-    set(key: string, value: string): void;
 }
 
 /**

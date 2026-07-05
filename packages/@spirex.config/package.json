@@ -38,6 +38,17 @@
             "default": {
                 "default": "./dist/index.js"
             }
+        },
+        "./in-memory": {
+            "import": {
+                "default": "./dist/in-memory.mjs"
+            },
+            "require": {
+                "default": "./dist/in-memory.cjs"
+            },
+            "default": {
+                "default": "./dist/in-memory.js"
+            }
         }
     },
     "scripts": {

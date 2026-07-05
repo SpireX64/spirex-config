@@ -1,5 +1,5 @@
 import { describe, test, expect, vi } from "vitest";
-import { configBuilder, InMemoryConfigProvider } from "./index";
+import { configBuilder } from "./index";
 
 function mockProvider(get) {
     return {
@@ -238,83 +238,27 @@ describe("@spirex/config", () => {
             expect(providerB.get).toHaveBeenCalledExactlyOnceWith(key);
             expect(value).eq("B");
         });
-    });
 
-    describe("InMemoryConfigProvider", () => {
-        describe("Create in-memory provider", () => {
-            test("Empty", () => {
-                // Act ----------
-                var provider = new InMemoryConfigProvider();
-                provider.load();
+        test("Map section to a typed object", () => {
+            // Arrange -------
+            var provider = mockProvider((key) => {
+                if (key === "db:host") return "localhost";
+                if (key === "db:port") return "5432";
+                return undefined;
+            });
+            var config = configBuilder().add(provider).build();
+            var section = config.section("db");
 
-                // Assert -------
-                expect(provider.get("any")).toBeUndefined();
+            // Act -----------
+            var result = section.map(function (s) {
+                return {
+                    host: s.getString("host"),
+                    port: s.getInteger("port"),
+                };
             });
 
-            test("From object", () => {
-                // Arrange -------
-                var source = { foo: "bar" };
-
-                // Act -----------
-                var provider = new InMemoryConfigProvider(source);
-                provider.load();
-
-                // Assert --------
-                expect(provider.get("foo")).eq("bar");
-            });
-
-            test("From map", () => {
-                // Arrange -------
-                var sourceMap = new Map();
-                sourceMap.set("foo", "bar");
-
-                // Act -----------
-                var provider = new InMemoryConfigProvider(sourceMap);
-                provider.load();
-
-                // Assert --------
-                expect(provider.get("foo")).eq("bar");
-            });
-
-            test("From object entries", () => {
-                // Arrange -------
-                var entries = [["foo", "bar"]];
-
-                // Act -----------
-                var provider = new InMemoryConfigProvider(entries);
-                provider.load();
-
-                // Assert --------
-                expect(provider.get("foo")).eq("bar");
-            });
-        });
-
-        describe("Set value", () => {
-            test("When provider is empty", () => {
-                // Arrange ---------
-                var provider = new InMemoryConfigProvider();
-                provider.load();
-
-                // Act ------------
-                provider.set("foo", "bar");
-
-                // Assert ---------
-                expect(provider.get("foo")).eq("bar");
-            });
-
-            test("Override exist value", () => {
-                // Arrange -------
-                var provider = new InMemoryConfigProvider({
-                    foo: "bar",
-                });
-                provider.load();
-
-                // Act -----------
-                provider.set("foo", "qwe");
-
-                // Assert --------
-                expect(provider.get("foo")).eq("qwe");
-            });
+            // Assert --------
+            expect(result).toEqual({ host: "localhost", port: 5432 });
         });
     });
 });
